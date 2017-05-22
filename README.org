@@ -1,0 +1,38 @@
+#+TITLE: splitter
+#+OPTIONS: toc:3 author:t creator:nil num:nil
+#+AUTHOR: Chris Rayner
+#+EMAIL: dchrisrayner@gmail.com
+
+* Table of Contents :TOC_3_gh:noexport:
+- [[#description][Description]]
+- [[#split-screen-scrolling][Split-screen scrolling]]
+
+* Description
+* Split-screen scrolling
+  To enable split-screen scrolling, add the following to your ~.emacs~:
+  #+begin_src elisp
+  (require 'shx-split)
+  #+end_src
+
+  Now paging up causes a comint-mode window to be split in two, with a larger
+  window on top and a smaller input window preserved on the bottom:
+  #+begin_src
+  +--------------+
+  | -------      |
+  | -------      |
+  | -------      |
+  |    [head]    |
+  |(show history)|
+  +--------------+
+  |    [tail]    |
+  |(show context)|
+  +--------------+
+  #+end_src
+  Paging down to the bottom causes the split to disappear.
+
+  This lets you enter text at the prompt (in the input window) and monitor new
+  input, while consulting previous output (in the scrolling window)
+  uninterrupted.
+
+  Change the height of the tail to something else by customizing the
+  ~shx-split-rows~ variable.

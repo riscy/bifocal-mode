@@ -60,10 +60,6 @@
 (require 'comint)
 (require 'windmove)
 
-;; Compiler pacifier
-(defvar evil-insert-state-local-map)
-(defvar evil-normal-state-local-map)
-
 (defgroup bifocal nil
   "For split-screen scrolling inside a comint-mode buffer."
   :prefix "bifocal-"

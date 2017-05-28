@@ -27,25 +27,25 @@
 
 (require 'shx-test)
 
-(defun shx-test-bifocal-mode ()
+(defun shx-test-case-bifocal-mode ()
   "Test window splitting functions."
   (goto-char (point-max))
   (if (< (window-height) bifocal-min-rows)
       (shx-test-warn "Warning: window too short to test bifocal")
-    (shx-test-assert "Create split."
+    (shx-test-assert "Create split, don't move cursor."
                      (let ((currpt (point)))
                        (bifocal-up)
-                       (and bifocal-active
-                            (eq currpt (point)))))
+                       (eq currpt (point))))
     (shx-test-assert "Maintain split."
                      (let ((currpt (point)))
                        (bifocal-home)
                        (eq currpt (point))))
-    (shx-test-assert "Destroy split."
+    ;;(shx-test-assert "Stay in head when paging up on the head."
+    ;;(shx-test-assert "Stay in head when paging down on the head."
+    (shx-test-assert "Destroy split, don't move cursor."
                      (let ((currpt (point)))
                        (bifocal-end)
-                       (and (not bifocal-active)
-                            (eq currpt (point)))))
+                       (eq currpt (point))))
     (shx-test-assert "Create and destroy with home/end."
                      (let ((currpt (point)))
                        (bifocal-home)
@@ -57,6 +57,6 @@
                        (bifocal-down) (bifocal-down) (bifocal-down)
                        (eq currpt (point))))
     (shx-test-assert "Try to find nonexistent split."
-                     (null (bifocal-find-tail)))))
+                     (null (bifocal--find-tail)))))
 
 (provide 'bifocal-test)

@@ -1,21 +1,18 @@
-#+TITLE: splitter
+#+TITLE: bifocal-mode
 #+OPTIONS: toc:3 author:t creator:nil num:nil
 #+AUTHOR: Chris Rayner
 #+EMAIL: dchrisrayner@gmail.com
 
 * Table of Contents :TOC_3_gh:noexport:
 - [[#description][Description]]
-- [[#split-screen-scrolling][Split-screen scrolling]]
+- [[#install][Install]]
+- [[#run][Run]]
+- [[#key-bindings][Key bindings]]
 
 * Description
-* Split-screen scrolling
-  To enable split-screen scrolling, add the following to your ~.emacs~:
-  #+begin_src elisp
-  (require 'shx-split)
-  #+end_src
-
-  Now paging up causes a comint-mode window to be split in two, with a larger
-  window on top and a smaller input window preserved on the bottom:
+  When ~bifocal-mode~ is enabled, paging up causes a comint-mode window to be
+  split in two, with a larger window on top and a smaller input window preserved
+  on the bottom:
   #+begin_src
   +--------------+
   | -------      |
@@ -34,5 +31,42 @@
   input, while consulting previous output (in the scrolling window)
   uninterrupted.
 
-  Change the height of the tail to something else by customizing the
-  ~shx-split-rows~ variable.
+  Use ~M-x customize-group RET bifocal RET~ to see customization options.
+* Install
+  Add the following to your ~.emacs~:
+
+  #+begin_src elisp
+  (add-to-list 'load-path "~/path/to/bifocal/")
+  (require 'bifocal)
+  #+end_src
+* Run
+  To enable ~bifocal-mode~ in every ~comint-mode~ buffer, use:
+
+  #+begin_src elisp
+  (comint-global-mode 1)
+  #+end_src
+
+  You can also use ~M-x bifocal-mode~ on a case-by-case basis, or just
+  add hooks into the mode in question, for example:
+
+  #+begin_src elisp
+  (add-hook 'inferior-python-mode-hook #'bifocal-mode)
+  #+end_src
+* Key bindings
+  | Key binding          | Description                                             |
+  |----------------------+---------------------------------------------------------|
+  | ~<prior>~ (page-up)  | Scroll up; create a split if none exists.               |
+  | ~<next>~ (page-down) | Scroll down; remove the split if the bottom is reached. |
+  | ~<home>~, ~M-<~      | Scroll all the way up; create a split if none exists.   |
+  | ~<end>~, ~M->~       | Scroll all the way down; remove the split.              |
+
+  For compatibility with evil-mode keybindings, you might add
+  something like the following to your config:
+
+  #+begin_src elisp
+  (add-hook 'comint-mode-hook
+            (define-key evil-insert-state-local-map (kbd "C-u") #'bifocal-up)
+            (define-key evil-normal-state-local-map (kbd "C-u") #'bifocal-up)
+            (define-key evil-insert-state-local-map (kbd "C-d") #'bifocal-down)
+            (define-key evil-normal-state-local-map (kbd "C-d") #'bifocal-down))
+  #+end_src

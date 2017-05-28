@@ -86,16 +86,7 @@
     (define-key keymap (kbd "<end>") #'bifocal-end)
     (define-key keymap (kbd "M->") #'bifocal-end)
     keymap)
-  "Keymap used for `bifocal-mode'.\n
-For compatibility with evil-mode keybindings, you might add
-something like the following to your config:\n
-\(add-hook 'comint-mode-hook
-          \(define-key evil-insert-state-local-map \(kbd \"C-u\"\) nil\)
-          \(define-key evil-normal-state-local-map \(kbd \"C-u\"\) nil\)
-          \(define-key evil-insert-state-local-map \(kbd \"C-d\"\) nil\)
-          \(define-key evil-normal-state-local-map \(kbd \"C-d\"\) nil\))
-\(define-key comint-mode-map \(kbd \"C-u\"\) #'bifocal-up\)
-\(define-key comint-mode-map \(kbd \"C-d\"\) #'bifocal-down\)")
+  "Keymap used for `bifocal-mode'.")
 
 (defvar-local bifocal--old-scroll-on-output
   "Internal variable for remembering user scroll options.")

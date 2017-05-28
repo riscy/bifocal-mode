@@ -1,4 +1,4 @@
-#+TITLE: bifocal-mode
+#+TITLE: bifocal-mode 👓
 #+OPTIONS: toc:3 author:t creator:nil num:nil
 #+AUTHOR: Chris Rayner
 #+EMAIL: dchrisrayner@gmail.com
@@ -10,9 +10,9 @@
 - [[#key-bindings][Key bindings]]
 
 * Description
-  When ~bifocal-mode~ is enabled, paging up causes a comint-mode window to be
-  split in two, with a larger window on top and a smaller input window preserved
-  on the bottom:
+  In ~bifocal-mode~, paging up causes a comint-mode window to be
+  split in two, with a larger window on top (the head) and a smaller input
+  window preserved on the bottom (the tail):
   #+begin_src
   +--------------+
   | -------      |
@@ -25,11 +25,10 @@
   |(show context)|
   +--------------+
   #+end_src
-  Paging down to the bottom causes the split to disappear.
+  Paging down all the way causes the split to disappear.
 
-  This lets you enter text at the prompt (in the input window) and monitor new
-  input, while consulting previous output (in the scrolling window)
-  uninterrupted.
+  This lets you enter text at the prompt (in the tail window) and monitor new
+  input, while reviewing previous output (in the head window).
 
   Use ~M-x customize-group RET bifocal RET~ to see customization options.
 * Install
@@ -43,7 +42,7 @@
   To enable ~bifocal-mode~ in every ~comint-mode~ buffer, use:
 
   #+begin_src elisp
-  (comint-global-mode 1)
+  (bifocal-global-mode 1)
   #+end_src
 
   You can also use ~M-x bifocal-mode~ on a case-by-case basis, or just

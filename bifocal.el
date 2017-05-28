@@ -1,8 +1,8 @@
-;;; bifocal.el --- Split a comint-mode buffer while scrolling
+;;; bifocal.el --- split-screen scrolling for comint-mode buffers
 
 ;; Authors: Chris Rayner (dchrisrayner @ gmail)
 ;; Created: May 23 2011
-;; Keywords: frames, tools, bananas
+;; Keywords: frames, processes, tools
 ;; Homepage: https://github.com/riscy/bifocal-mode
 ;; Package-Requires: ((emacs "24.4"))
 ;; Version: 0.0.0
@@ -24,9 +24,9 @@
 
 ;;; Commentary:
 
-;; Automatically split the buffer into a head and a tail when you page up and
-;; down in a scrolling buffer (such as shell-mode, comint-mode, ...) to help you
-;; keep context when referring to earlier output.
+;; In bifocal-mode, paging up causes a comint-mode window to be split in two,
+;; with a larger window on top (the head) and a smaller input window preserved
+;; on the bottom (the tail):
 ;;
 ;; +--------------+
 ;; | -------      |
@@ -38,6 +38,10 @@
 ;; |    [tail]    |
 ;; |(show context)|
 ;; +--------------+
+;;
+;; Paging down all the way causes the split to disappear.  This lets you enter
+;; text at the prompt (in the tail window) and monitor new input, while
+;; reviewing previous output (in the head window).
 ;;
 ;; This version tested with Emacs 25.1.1
 ;;
@@ -86,7 +90,7 @@
     (define-key keymap (kbd "<end>") #'bifocal-end)
     (define-key keymap (kbd "M->") #'bifocal-end)
     keymap)
-  "Keymap used for `bifocal-mode'.")
+  "Bifocal keymap.")
 
 (defvar-local bifocal--old-scroll-on-output
   "Internal variable for remembering user scroll options.")
@@ -110,8 +114,7 @@
   (setq comint-scroll-to-bottom-on-input nil))
 
 (defun bifocal-end ()
-  "If the window is split, remove the split.
-See `bifocal-up' and `bifocal-down'."
+  "If the window is split, remove the split."
   (interactive)
   (when (not (bifocal--find-tail))
     (goto-char (point-max))
@@ -225,7 +228,7 @@ the tail is not visible and/or the matching buffer is not above."
 (define-minor-mode bifocal-mode
   "Toggle bifocal-mode on or off.
 \nThis minor mode will automatically split the buffer into a head
-and a tail when you page up and down in a comint-mode derived
+and a tail when paging up and down in a comint-mode derived
 buffer (such as shell-mode, inferior-python-mode, etc).\n
 Use `bifocal-global-mode' to enable `bifocal-mode'
 in all buffers that support it.\n

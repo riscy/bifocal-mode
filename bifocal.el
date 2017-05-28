@@ -100,31 +100,35 @@
 (defun bifocal-begin ()
   "Move to the end of the buffer and create the head/tail window pair."
   (interactive)
-  (goto-char (point-max))
-  (split-window-vertically (- (window-height) bifocal-rows))
-  ;; remember old comint-scroll settings
-  (setq bifocal--old-scroll-on-output comint-scroll-to-bottom-on-output)
-  (setq bifocal--old-scroll-on-input comint-scroll-to-bottom-on-input)
-  ;; only auto-scroll the window the user's cursor is in
-  (setq comint-scroll-to-bottom-on-output "this")
-  (setq comint-scroll-to-bottom-on-input nil))
+  (bifocal--recenter-at-point-max)
+  (bifocal--tweak-scroll-settings)
+  (split-window-vertically (- (window-height) bifocal-rows)))
+
+(defun bifocal-down ()
+  "Scroll down in the buffer.
+If the window is split, scroll the head window only.  If scrolling
+down scrolls all the way down to the prompt, remove the split."
+  (interactive)
+  (if (not (bifocal--find-tail))
+      (bifocal--scroll-down)
+    (windmove-up)
+    (move-to-window-line -1)
+    (bifocal--scroll-down)
+    ;; go to end of line so that on-last-line works:
+    (if (bifocal--on-input-p (point-at-eol))
+        (bifocal-end)
+      (windmove-down))
+    (goto-char (point-max)))
+  (recenter -1))
 
 (defun bifocal-end ()
   "If the window is split, remove the split."
   (interactive)
-  (when (not (bifocal--find-tail))
-    (goto-char (point-max))
-    (recenter -1))
   (when (bifocal--find-tail)
-    (goto-char (point-max))
-    ;; restore old comint settings regarding scrolling
-    (setq-local comint-scroll-to-bottom-on-output bifocal--old-scroll-on-output)
-    (setq-local comint-scroll-to-bottom-on-input bifocal--old-scroll-on-input)
+    (bifocal--untweak-scroll-settings)
     (windmove-up)
     (delete-window))
-  ;; realign
-  (goto-char (point-max))
-  (recenter -1))
+  (bifocal--recenter-at-point-max))
 
 (defun bifocal-home ()
   "Scroll all the way to the top."
@@ -139,47 +143,28 @@ window up.  If HOME is non-nil, scroll all the way to the top."
   (cond
    ((bifocal--splittable-p)
     (if (bifocal--find-tail)
-        (select-window (previous-window))
+        (windmove-up)
       (bifocal-begin))
     (if home
         (goto-char (point-min))
-      (bifocal--scroll-up)
-      (recenter -1))
-    (select-window (next-window))
-    (goto-char (point-max))
-    (recenter -1))
-   (t
+      (bifocal--scroll-up))
+    (windmove-down)
+    (bifocal--recenter-at-point-max))
+   (t ; window is unsplittable (too small)
     (if home
         (goto-char (point-min))
-      (bifocal--scroll-up)
-      (recenter -1)))))
+      (bifocal--scroll-up)))))
 
 (defun bifocal--scroll-down ()
   "Scroll down."
   (let ((line-move-visual t))
-    (ignore-errors (line-move bifocal-rows))))
+    (ignore-errors (line-move bifocal-rows)))
+  (recenter -1))
 
 (defun bifocal--scroll-up ()
   "Scroll up."
   (let ((line-move-visual t))
-    (ignore-errors (line-move (- bifocal-rows)))))
-
-(defun bifocal-down ()
-  "Scroll down in the buffer.
-If the window is split, scroll the head window only.  If scrolling
-down scrolls all the way down to the prompt, remove the split."
-  (interactive)
-  (if (not (bifocal--find-tail))
-      (bifocal--scroll-down)
-    (select-window (previous-window))
-    (move-to-window-line -1)
-    (bifocal--scroll-down)
-    (recenter -1)
-    ;; go to end of line so that on-last-line works:
-    (if (save-excursion (end-of-line) (bifocal--point-on-input-p))
-        (bifocal-end)
-      (select-window (next-window)))
-    (goto-char (point-max)))
+    (ignore-errors (line-move (- bifocal-rows))))
   (recenter -1))
 
 
@@ -190,33 +175,53 @@ down scrolls all the way down to the prompt, remove the split."
 Put the cursor on the tail at the end of buffer, or return nil if
 the tail is not visible and/or the matching buffer is not above."
   (cond
-   ((bifocal--on-head-p) (select-window (next-window)))
+   ((bifocal--on-head-p) (windmove-down))
    ((bifocal--on-tail-p) t)
    (t nil)))
 
-(defun bifocal--on-tail-p ()
-  "True if the cursor is on the tail window."
-  (and (eq (current-buffer) (window-buffer (previous-window)))
-       ;; check if the bottom window is approximately the right size
-       (< (abs (- (window-height) bifocal-rows)) 5)))
-
 (defun bifocal--on-head-p ()
-  "True if the cursor is on the head window."
+  "Whether the cursor is on the head window."
+  ;; TODO: use (windmove-find-other-window 'down)
   (and (eq (current-buffer) (window-buffer (next-window)))
        ;; check if the bottom window is approximately the right size
        (< (abs (- (window-height (next-window)) bifocal-rows)) 5)))
 
-(defun bifocal--point-on-input-p ()
-  "Check if point is on the input region."
-  (>= (point-marker)
-      (process-mark (get-buffer-process (current-buffer)))))
+(defun bifocal--on-input-p (point)
+  "Check if POINT is in the input region."
+  (>= point (process-mark (get-buffer-process (current-buffer)))))
+
+(defun bifocal--on-tail-p ()
+  "Whether the cursor is on the tail window."
+  (and (eq (current-buffer) (window-buffer (previous-window)))
+       ;; check if the bottom window is approximately the right size
+       ;; TODO: instead use (window-normalize-window nil) to verify?
+       (< (abs (- (window-height) bifocal-rows)) 5)))
+
+(defun bifocal--recenter-at-point-max ()
+  "Move to point-max; align content with bottom of window."
+  (goto-char (point-max))
+  (recenter -1))
 
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
-  (and (bifocal--point-on-input-p)
+  (and (bifocal--on-input-p (point-marker))
        (or
         (bifocal--find-tail)
         (>= (window-height) bifocal-min-rows))))
+
+(defun bifocal--tweak-scroll-settings ()
+  "Tweak comint scrolling settings for split-screen scrolling.
+Remember old comint-scroll settings to restore later."
+  (setq bifocal--old-scroll-on-output comint-scroll-to-bottom-on-output
+        bifocal--old-scroll-on-input comint-scroll-to-bottom-on-input)
+  ;; only auto-scroll the window the user's cursor is in
+  (setq comint-scroll-to-bottom-on-output "this"
+        comint-scroll-to-bottom-on-input nil))
+
+(defun bifocal--untweak-scroll-settings ()
+  "Restore old comint settings regarding scrolling."
+  (setq comint-scroll-to-bottom-on-output bifocal--old-scroll-on-output
+        comint-scroll-to-bottom-on-input bifocal--old-scroll-on-input))
 
 
 ;;; loading

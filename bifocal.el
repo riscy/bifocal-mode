@@ -230,7 +230,10 @@ Use `bifocal-global-mode' to enable `bifocal-mode'
 in all buffers that support it.\n
 Provides the following bindings: \n\\{bifocal-mode-map}"
   :lighter bifocal-mode-lighter
-  :keymap bifocal-mode-map)
+  :keymap bifocal-mode-map
+  (if bifocal-mode
+      nil
+    (bifocal-end)))
 
 (define-globalized-minor-mode bifocal-global-mode bifocal-mode
   (lambda ()

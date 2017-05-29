@@ -180,6 +180,12 @@ the tail is not visible and/or the matching buffer is not above."
    ((bifocal--point-on-tail-p) t)
    (t nil)))
 
+(defun bifocal--last-line-p (point)
+  "Whether POINT is on the same line as the process-mark."
+  (save-excursion
+    (forward-line)
+    (>= point (process-mark (get-buffer-process (current-buffer))))))
+
 (defun bifocal--move-point-down ()
   "Move the point down `bifocal-rows' and recenter the buffer."
   (let ((line-move-visual t))
@@ -199,10 +205,6 @@ the tail is not visible and/or the matching buffer is not above."
          (eq (selected-window) bifocal--head-window)
          (eq tail-window bifocal--tail-window))))
 
-(defun bifocal--on-input-p (point)
-  "Whether POINT is in the input region."
-  (>= point (process-mark (get-buffer-process (current-buffer)))))
-
 (defun bifocal--point-on-tail-p ()
   "Whether the point is on the tail window."
   (let ((head-window (windmove-find-other-window 'up)))
@@ -217,7 +219,7 @@ the tail is not visible and/or the matching buffer is not above."
 
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
-  (and (bifocal--on-input-p (point-marker))
+  (and (bifocal--on-last-line-p (point-marker))
        (or
         (bifocal--find-tail)
         (>= (window-height) bifocal-min-rows))))

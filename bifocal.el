@@ -73,6 +73,10 @@
   :link '(function-link bifocal--splittable-p)
   :type 'integer)
 
+(defcustom bifocal-mode-lighter "B)"
+  "Lighter for the bifocal minor mode."
+  :type 'string)
+
 (defcustom bifocal-rows 15
   "How large the tail will be."
   :type 'integer)
@@ -86,7 +90,7 @@
     (define-key keymap (kbd "<end>") #'bifocal-end)
     (define-key keymap (kbd "M->") #'bifocal-end)
     keymap)
-  "Bifocal keymap.")
+  "Keymap for the bifocal minor mode.")
 
 (defvar-local bifocal--old-scroll-on-input nil
   "For restoring previous scroll options.")

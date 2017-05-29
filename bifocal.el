@@ -43,6 +43,8 @@
 ;; text at the prompt (in the tail window) and monitor new input, while
 ;; reviewing previous output (in the head window).
 ;;
+;; Note if you're not on the last line of the buffer, no split will appear.
+;;
 ;; This version tested with Emacs 25.1.1
 ;;
 ;; See README.org for more details.
@@ -65,20 +67,20 @@
   :prefix "bifocal-"
   :group 'comint
   :link '(url-link
-          :tag "Github"
-          "https://github.com/riscy/bifocal"))
+          :tag "the Github repository"
+          "https://github.com/riscy/bifocal-mode"))
 
-(defcustom bifocal-min-rows 30
+(defcustom bifocal-minimum-rows-before-splitting 30
   "The minimum window height before splitting the window is allowed."
   :link '(function-link bifocal--splittable-p)
   :type 'integer)
 
-(defcustom bifocal-mode-lighter "B)"
+(defcustom bifocal-mode-lighter "B"
   "Lighter for the bifocal minor mode."
   :type 'string)
 
-(defcustom bifocal-rows 15
-  "How large the tail will be."
+(defcustom bifocal-tail-size 15
+  "How large the tail will be when splitting the window."
   :type 'integer)
 
 (defvar bifocal-mode-map
@@ -92,11 +94,11 @@
     keymap)
   "Keymap for the bifocal minor mode.")
 
-(defvar-local bifocal--old-scroll-on-input nil
-  "For restoring previous scroll options.")
+(defvar-local bifocal--old-comint-scroll-on-input 'unset
+  "Stores previously set value, so it can be restored.")
 
-(defvar-local bifocal--old-scroll-on-output nil
-  "For restoring previous scroll options.")
+(defvar-local bifocal--old-comint-scroll-on-output 'unset
+  "Stores previously set value, so it can be restored.")
 
 (defvar-local bifocal--head-window nil
   "For remembering which window was the head.")
@@ -106,8 +108,8 @@
 
 (defun bifocal-down ()
   "Scroll down.
-If the window is split, scroll the head window only.  If this
-scrolls all the way to the last line, remove the split."
+If the window is split, scroll down in the head window only.  If
+this scrolls all the way to the last line, remove the split."
   (interactive)
   (if (not (bifocal--find-head))
       (bifocal--move-point-down)
@@ -154,11 +156,11 @@ the head window.  If HOME is non-nil, scroll to the top."
 Tweak comint scrolling settings for split-screen scrolling.
 Remember old comint-scroll settings to restore later."
   (bifocal--recenter-at-point-max)
-  (split-window-vertically (- (window-height) bifocal-rows))
+  (split-window-vertically (- (window-height) bifocal-tail-size))
   (setq bifocal--head-window (selected-window)
         bifocal--tail-window (next-window)
-        bifocal--old-scroll-on-output comint-scroll-to-bottom-on-output
-        bifocal--old-scroll-on-input comint-scroll-to-bottom-on-input
+        bifocal--old-comint-scroll-on-output comint-scroll-to-bottom-on-output
+        bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input
         comint-scroll-to-bottom-on-output "this"
         comint-scroll-to-bottom-on-input nil))
 
@@ -168,8 +170,8 @@ Restore old comint settings for scrolling."
   (when (bifocal--find-head) (delete-window))
   (setq bifocal--head-window nil
         bifocal--tail-window nil
-        comint-scroll-to-bottom-on-output bifocal--old-scroll-on-output
-        comint-scroll-to-bottom-on-input bifocal--old-scroll-on-input))
+        comint-scroll-to-bottom-on-output bifocal--old-comint-scroll-on-output
+        comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
 
 (defun bifocal--find-head ()
   "Put the point on the head window.
@@ -180,21 +182,21 @@ Return nil if the head window is not identifiable."
    (t nil)))
 
 (defun bifocal--last-line-p (point)
-  "Whether POINT is on the same line as the process-mark."
+  "Whether POINT is on the same line as `process-mark'."
   (save-excursion
-    (forward-line)
-    (>= point (process-mark (get-buffer-process (current-buffer))))))
+    (goto-char point)
+    (>= (point-at-eol) (process-mark (get-buffer-process (current-buffer))))))
 
 (defun bifocal--move-point-down ()
-  "Move the point down `bifocal-rows' and recenter the buffer."
+  "Move the point down `bifocal-tail-size' rows, and recenter."
   (let ((line-move-visual t))
-    (ignore-errors (line-move bifocal-rows)))
+    (ignore-errors (line-move bifocal-tail-size)))
   (recenter -1))
 
 (defun bifocal--move-point-up ()
-  "Move the point up `bifocal-rows' and recenter the buffer."
+  "Move the point up `bifocal-tail-size' rows, and recenter."
   (let ((line-move-visual t))
-    (ignore-errors (line-move (- bifocal-rows))))
+    (ignore-errors (line-move (- bifocal-tail-size))))
   (recenter -1))
 
 (defun bifocal--point-on-head-p ()
@@ -212,7 +214,7 @@ Return nil if the head window is not identifiable."
          (eq head-window bifocal--head-window))))
 
 (defun bifocal--recenter-at-point-max ()
-  "Move to point-max; align content with bottom of window."
+  "Move the point to `point-max', and recenter."
   (goto-char (point-max))
   (recenter -1))
 
@@ -221,17 +223,18 @@ Return nil if the head window is not identifiable."
   (and (bifocal--last-line-p (point-marker))
        (or
         (bifocal--find-head)
-        (>= (window-height) bifocal-min-rows))))
+        (>= (window-height) bifocal-minimum-rows-before-splitting))))
 
 ;;;###autoload
 (define-minor-mode bifocal-mode
-  "Toggle bifocal-mode on or off.
-\nThis minor mode will automatically split the buffer into a head
-and a tail when paging up and down in a comint-mode derived
-buffer (such as shell-mode, inferior-python-mode, etc).\n
-Use `bifocal-global-mode' to enable `bifocal-mode'
-in all buffers that support it.\n
-Provides the following bindings: \n\\{bifocal-mode-map}"
+  "Toggle bifocal-mode on or off.\n
+  bifocal-mode splits the buffer into a head and a tail when
+paging up and down in a comint-mode derived buffer (such as
+shell-mode, inferior-python-mode, etc).\n
+  Use `bifocal-global-mode' to enable `bifocal-mode' in all
+buffers that support it.\n
+  Provides the following bindings:\n
+\\{bifocal-mode-map}"
   :lighter bifocal-mode-lighter
   :keymap bifocal-mode-map
   (if bifocal-mode

@@ -30,7 +30,7 @@
 (defun shx-test-case-bifocal-mode ()
   "Test window splitting functions."
   (goto-char (point-max))
-  (if (< (window-height) bifocal-min-rows)
+  (if (< (window-height) bifocal-minimum-rows-before-splitting)
       (shx-test-warn "Warning: window too short to test bifocal")
     (shx-test-assert "Create split, don't move cursor."
                      (let ((currpt (point)))

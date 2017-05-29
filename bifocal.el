@@ -111,7 +111,7 @@ scrolls all the way down to the prompt, remove the split."
     (move-to-window-line -1)
     (bifocal--move-point-down)
     ;; go to end of line so that on-last-line works:
-    (if (bifocal--on-input-p (point-at-eol))
+    (if (bifocal--last-line-p (point))
         (bifocal-end)
       (windmove-down))
     (goto-char (point-max)))
@@ -219,7 +219,7 @@ the tail is not visible and/or the matching buffer is not above."
 
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
-  (and (bifocal--on-last-line-p (point-marker))
+  (and (bifocal--last-line-p (point-marker))
        (or
         (bifocal--find-tail)
         (>= (window-height) bifocal-min-rows))))

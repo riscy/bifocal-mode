@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 
-;; In bifocal-mode, paging up causes a comint-mode window to be split in two,
+;; In bifocal-mode, paging up causes a comint-mode window to be split in two
 ;; with a larger window on top (the head) and a smaller input window preserved
 ;; on the bottom (the tail):
 ;;
@@ -98,16 +98,16 @@
 ;;; core
 
 (defun bifocal-begin ()
-  "Move to the end of the buffer and create the head/tail window pair."
+  "Create the head/tail window pair."
   (interactive)
   (bifocal--recenter-at-point-max)
   (bifocal--tweak-scroll-settings)
   (split-window-vertically (- (window-height) bifocal-rows)))
 
 (defun bifocal-down ()
-  "Scroll down in the buffer.
-If the window is split, scroll the head window only.  If scrolling
-down scrolls all the way down to the prompt, remove the split."
+  "Scroll down.
+If the window is split, scroll the head window only.  If this
+scrolls all the way down to the prompt, remove the split."
   (interactive)
   (if (not (bifocal--find-tail))
       (bifocal--scroll-down)
@@ -122,7 +122,7 @@ down scrolls all the way down to the prompt, remove the split."
   (recenter -1))
 
 (defun bifocal-end ()
-  "If the window is split, remove the split."
+  "Remove the head/tail split, if it exists."
   (interactive)
   (when (bifocal--find-tail)
     (bifocal--untweak-scroll-settings)
@@ -131,14 +131,15 @@ down scrolls all the way down to the prompt, remove the split."
   (bifocal--recenter-at-point-max))
 
 (defun bifocal-home ()
-  "Scroll all the way to the top."
+  "Scroll to the top of the buffer.
+Create the head/tail split if none exists."
   (interactive)
   (bifocal-up 'home))
 
 (defun bifocal-up (&optional home)
-  "Scroll up in the buffer.
-If the window is not split, try to split it.  Then scroll the head
-window up.  If HOME is non-nil, scroll all the way to the top."
+  "Scroll up.
+If the window is not split, try to split it.  Then scroll up in
+the head window.  If HOME is non-nil, scroll to the top."
   (interactive)
   (cond
    ((bifocal--splittable-p)
@@ -156,13 +157,13 @@ window up.  If HOME is non-nil, scroll all the way to the top."
       (bifocal--scroll-up)))))
 
 (defun bifocal--scroll-down ()
-  "Scroll down."
+  "Move the point down `bifocal-rows' and recenter the buffer."
   (let ((line-move-visual t))
     (ignore-errors (line-move bifocal-rows)))
   (recenter -1))
 
 (defun bifocal--scroll-up ()
-  "Scroll up."
+  "Move the point up `bifocal-rows' and recenter the buffer."
   (let ((line-move-visual t))
     (ignore-errors (line-move (- bifocal-rows))))
   (recenter -1))
@@ -187,7 +188,7 @@ the tail is not visible and/or the matching buffer is not above."
        (< (abs (- (window-height (next-window)) bifocal-rows)) 5)))
 
 (defun bifocal--on-input-p (point)
-  "Check if POINT is in the input region."
+  "Whether POINT is in the input region."
   (>= point (process-mark (get-buffer-process (current-buffer)))))
 
 (defun bifocal--on-tail-p ()

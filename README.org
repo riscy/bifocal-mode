@@ -10,9 +10,9 @@
 - [[#key-bindings][Key bindings]]
 
 * Description
-  In ~bifocal-mode~, paging up causes a comint-mode window to be
-  split in two, with a larger window on top (the head) and a smaller input
-  window preserved on the bottom (the tail):
+  In ~bifocal-mode~, paging up causes a comint-mode window to be split in two
+  with a larger window on top (the head) and a smaller input window preserved on
+  the bottom (the tail):
   #+begin_src
   +--------------+
   | -------      |

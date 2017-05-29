@@ -57,6 +57,6 @@
                        (bifocal-down) (bifocal-down) (bifocal-down)
                        (eq currpt (point))))
     (shx-test-assert "Try to find nonexistent split."
-                     (null (bifocal--find-tail)))))
+                     (null (bifocal--find-head)))))
 
 (provide 'bifocal-test)

@@ -103,29 +103,26 @@
 (defun bifocal-down ()
   "Scroll down.
 If the window is split, scroll the head window only.  If this
-scrolls all the way down to the prompt, remove the split."
+scrolls all the way to the last line, remove the split."
   (interactive)
-  (if (not (bifocal--find-tail))
+  (if (not (bifocal--find-head))
       (bifocal--move-point-down)
-    (windmove-up)
     (move-to-window-line -1)
     (bifocal--move-point-down)
-    ;; go to end of line so that on-last-line works:
     (if (bifocal--last-line-p (point))
         (bifocal-end)
       (windmove-down))
-    (goto-char (point-max)))
-  (recenter -1))
+    (bifocal--recenter-at-point-max)))
 
 (defun bifocal-end ()
-  "Remove the head/tail split, if it exists."
+  "Remove the head/tail split if it exists."
   (interactive)
   (bifocal--destroy-split)
   (bifocal--recenter-at-point-max))
 
 (defun bifocal-home ()
   "Scroll to the top of the buffer.
-Create the head/tail split if none exists."
+Create the head/tail split unless it exists."
   (interactive)
   (bifocal-up 'home))
 
@@ -136,7 +133,7 @@ the head window.  If HOME is non-nil, scroll to the top."
   (interactive)
   (cond
    ((bifocal--splittable-p)
-    (if (bifocal--find-tail) (windmove-up)
+    (unless (bifocal--find-head)
       (bifocal--create-split))
     (if home
         (goto-char (point-min))
@@ -164,20 +161,18 @@ Remember old comint-scroll settings to restore later."
 (defun bifocal--destroy-split ()
   "Destroy the head/tail window pair.
 Restore old comint settings for scrolling."
-  (when (bifocal--find-tail)
-    (delete-window (windmove-find-other-window 'up)))
+  (when (bifocal--find-head) (delete-window))
   (setq bifocal--head-window nil
         bifocal--tail-window nil
         comint-scroll-to-bottom-on-output bifocal--old-scroll-on-output
         comint-scroll-to-bottom-on-input bifocal--old-scroll-on-input))
 
-(defun bifocal--find-tail ()
-  "Find the tail window.
-Put the point on the tail at the end of buffer, or return nil if
-the tail is not visible and/or the matching buffer is not above."
+(defun bifocal--find-head ()
+  "Put the point on the head window.
+Return nil if the head window is not identifiable."
   (cond
-   ((bifocal--point-on-head-p) (windmove-down))
-   ((bifocal--point-on-tail-p) t)
+   ((bifocal--point-on-tail-p) (windmove-up) t)
+   ((bifocal--point-on-head-p) t)
    (t nil)))
 
 (defun bifocal--last-line-p (point)
@@ -221,7 +216,7 @@ the tail is not visible and/or the matching buffer is not above."
   "Whether the current window is able to be split."
   (and (bifocal--last-line-p (point-marker))
        (or
-        (bifocal--find-tail)
+        (bifocal--find-head)
         (>= (window-height) bifocal-min-rows))))
 
 ;;;###autoload

@@ -224,6 +224,7 @@ the tail is not visible and/or the matching buffer is not above."
         (bifocal--find-tail)
         (>= (window-height) bifocal-min-rows))))
 
+;;;###autoload
 (define-minor-mode bifocal-mode
   "Toggle bifocal-mode on or off.
 \nThis minor mode will automatically split the buffer into a head
@@ -238,6 +239,7 @@ Provides the following bindings: \n\\{bifocal-mode-map}"
       nil
     (bifocal-end)))
 
+;;;###autoload
 (define-globalized-minor-mode bifocal-global-mode bifocal-mode
   (lambda ()
     (interactive)

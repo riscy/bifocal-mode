@@ -141,21 +141,17 @@ the head window.  If HOME is non-nil, scroll to the top."
    ((bifocal--splittable-p)
     (unless (bifocal--find-head)
       (bifocal--create-split))
-    (if home
-        (goto-char (point-min))
-      (bifocal--move-point-up))
+    (bifocal--move-point-up home)
     (windmove-down)
     (bifocal--recenter-at-point-max))
    (t ; window is unsplittable (too small)
-    (if home
-        (goto-char (point-min))
-      (bifocal--move-point-up)))))
+    (bifocal--move-point-up home))))
 
 (defun bifocal--create-split ()
   "Create the head/tail window pair; leave the point on the head.
 Tweak comint scrolling settings for split-screen scrolling.
 Remember old comint-scroll settings to restore later."
-  (bifocal--recenter-at-point-max)
+  (when (bifocal--last-line-p (point)) (bifocal--recenter-at-point-max))
   (split-window-vertically (- (window-height) bifocal-tail-size))
   (setq bifocal--head-window (selected-window)
         bifocal--tail-window (next-window)
@@ -193,10 +189,13 @@ Return nil if the head window is not identifiable."
     (ignore-errors (line-move bifocal-tail-size)))
   (recenter -1))
 
-(defun bifocal--move-point-up ()
-  "Move the point up `bifocal-tail-size' rows, and recenter."
-  (let ((line-move-visual t))
-    (ignore-errors (line-move (- bifocal-tail-size))))
+(defun bifocal--move-point-up (&optional home)
+  "Move the point up `bifocal-tail-size' rows, and recenter.
+If HOME is non-nil, go to `point-min' instead."
+  (if home
+      (goto-char (point-min))
+    (let ((line-move-visual t))
+      (ignore-errors (line-move (- bifocal-tail-size)))))
   (recenter -1))
 
 (defun bifocal--point-on-head-p ()

@@ -153,21 +153,28 @@ Tweak comint scrolling settings for split-screen scrolling.
 Remember old comint-scroll settings to restore later."
   (when (bifocal--last-line-p (point)) (bifocal--recenter-at-point-max))
   (split-window-vertically (- (window-height) bifocal-tail-size))
-  (setq bifocal--head-window (selected-window)
-        bifocal--tail-window (next-window)
-        bifocal--old-comint-scroll-on-output comint-scroll-to-bottom-on-output
-        bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input
-        comint-scroll-to-bottom-on-output "this"
-        comint-scroll-to-bottom-on-input nil))
+  (when (eq bifocal--old-comint-scroll-on-input 'unset)
+    (message ";; adjust comint-scroll options")
+    (setq bifocal--old-comint-scroll-on-output comint-scroll-to-bottom-on-output
+          bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input))
+  (setq comint-scroll-to-bottom-on-output "this"
+        comint-scroll-to-bottom-on-input nil
+        bifocal--head-window (selected-window)
+        bifocal--tail-window (next-window)))
 
 (defun bifocal--destroy-split ()
   "Destroy the head/tail window pair.
 Restore old comint settings for scrolling."
-  (when (bifocal--find-head) (delete-window))
-  (setq bifocal--head-window nil
-        bifocal--tail-window nil
-        comint-scroll-to-bottom-on-output bifocal--old-comint-scroll-on-output
-        comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
+  (when (bifocal--find-head)
+    (delete-window))
+  (unless (eq bifocal--old-comint-scroll-on-input 'unset)
+    (message ";; unadjust comint-scroll options")
+    (setq comint-scroll-to-bottom-on-output bifocal--old-comint-scroll-on-output
+          comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
+  (setq bifocal--old-comint-scroll-on-output 'unset
+        bifocal--old-comint-scroll-on-input 'unset
+        bifocal--head-window nil
+        bifocal--tail-window nil))
 
 (defun bifocal--find-head ()
   "Put the point on the head window.

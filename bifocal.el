@@ -177,9 +177,11 @@ Restore comint-scroll variables to their original values."
 (defun bifocal--find-head ()
   "Put the point on the head window.
 Return nil if the head window is not identifiable."
-  (cond ((bifocal--point-on-tail-p) (windmove-up) t)
-        ((bifocal--point-on-head-p) t)
-        (t nil)))
+  (and bifocal--head-window
+       bifocal--tail-window
+       (cond ((bifocal--point-on-tail-p) (windmove-up) t)
+             ((bifocal--point-on-head-p) t)
+             (t nil))))
 
 (defun bifocal--last-line-p (point)
   "Whether POINT is on the same line as `process-mark'."
@@ -205,16 +207,16 @@ If HOME is non-nil, go to `point-min' instead."
 (defun bifocal--point-on-head-p ()
   "Whether the point is on the head window."
   (let ((tail-window (windmove-find-other-window 'down)))
-    (and (eq (current-buffer) (window-buffer tail-window))
-         (eq (selected-window) bifocal--head-window)
-         (eq tail-window bifocal--tail-window))))
+    (and (eq tail-window bifocal--tail-window)
+         (eq (current-buffer) (window-buffer tail-window))
+         (eq (selected-window) bifocal--head-window))))
 
 (defun bifocal--point-on-tail-p ()
   "Whether the point is on the tail window."
   (let ((head-window (windmove-find-other-window 'up)))
-    (and (eq (current-buffer) (window-buffer head-window))
-         (eq (selected-window) bifocal--tail-window)
-         (eq head-window bifocal--head-window))))
+    (and (eq head-window bifocal--head-window)
+         (eq (current-buffer) (window-buffer head-window))
+         (eq (selected-window) bifocal--tail-window))))
 
 (defun bifocal--recenter-at-point-max ()
   "Move the point to `point-max', and recenter."

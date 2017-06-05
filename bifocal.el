@@ -138,15 +138,13 @@ Create the head/tail split unless it exists."
 If the window is not split, try to split it.  Then scroll up in
 the head window.  If HOME is non-nil, scroll to the top."
   (interactive)
-  (cond
-   ((bifocal--splittable-p)
-    (unless (bifocal--find-head)
-      (bifocal--create-split))
-    (bifocal--move-point-up home)
-    (windmove-down)
-    (bifocal--recenter-at-point-max))
-   (t ; window is unsplittable (too small)
-    (bifocal--move-point-up home))))
+  (cond ((bifocal--splittable-p)
+         (unless (bifocal--find-head)
+           (bifocal--create-split))
+         (bifocal--move-point-up home)
+         (windmove-down)
+         (bifocal--recenter-at-point-max))
+        (t (bifocal--move-point-up home))))
 
 (defun bifocal--create-split ()
   "Create the head/tail split, leaving `point' on the head.
@@ -179,10 +177,9 @@ Restore comint-scroll variables to their original values."
 (defun bifocal--find-head ()
   "Put the point on the head window.
 Return nil if the head window is not identifiable."
-  (cond
-   ((bifocal--point-on-tail-p) (windmove-up) t)
-   ((bifocal--point-on-head-p) t)
-   (t nil)))
+  (cond ((bifocal--point-on-tail-p) (windmove-up) t)
+        ((bifocal--point-on-head-p) t)
+        (t nil)))
 
 (defun bifocal--last-line-p (point)
   "Whether POINT is on the same line as `process-mark'."

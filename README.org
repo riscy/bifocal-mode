@@ -3,6 +3,8 @@
 #+AUTHOR: Chris Rayner
 #+EMAIL: dchrisrayner@gmail.com
 
+[[file:img/screenshot.png]]
+
 * Table of Contents :TOC_3_gh:noexport:
 - [[#description][Description]]
 - [[#install][Install]]

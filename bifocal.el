@@ -101,10 +101,10 @@
   "Stores previously set value, so it can be restored.")
 
 (defvar-local bifocal--head-window nil
-  "For remembering which window was the head.")
+  "For remembering which window is the head.")
 
 (defvar-local bifocal--tail-window nil
-  "For remembering which window was the tail.")
+  "For remembering which window is the tail.")
 
 (defun bifocal-down ()
   "Scroll down.
@@ -121,7 +121,8 @@ this scrolls all the way to the last line, remove the split."
     (bifocal--recenter-at-point-max)))
 
 (defun bifocal-end ()
-  "Remove the head/tail split if it exists."
+  "Scroll to the end of the buffer.
+Remove the head/tail split if it exists."
   (interactive)
   (bifocal--destroy-split)
   (bifocal--recenter-at-point-max))
@@ -148,13 +149,12 @@ the head window.  If HOME is non-nil, scroll to the top."
     (bifocal--move-point-up home))))
 
 (defun bifocal--create-split ()
-  "Create the head/tail window pair; leave the point on the head.
-Tweak comint scrolling settings for split-screen scrolling.
-Remember old comint-scroll settings to restore later."
-  (when (bifocal--last-line-p (point)) (bifocal--recenter-at-point-max))
+  "Create the head/tail split, leaving `point' on the head.
+Adjust comint-scroll variables for split-screen scrolling."
+  (bifocal--recenter-at-point-max)
   (split-window-vertically (- (window-height) bifocal-tail-size))
   (when (eq bifocal--old-comint-scroll-on-input 'unset)
-    (message ";; adjust comint-scroll options")
+    ;; adjust comint-scroll options
     (setq bifocal--old-comint-scroll-on-output comint-scroll-to-bottom-on-output
           bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input))
   (setq comint-scroll-to-bottom-on-output "this"
@@ -164,11 +164,11 @@ Remember old comint-scroll settings to restore later."
 
 (defun bifocal--destroy-split ()
   "Destroy the head/tail window pair.
-Restore old comint settings for scrolling."
+Restore comint-scroll variables to their original values."
   (when (bifocal--find-head)
     (delete-window))
   (unless (eq bifocal--old-comint-scroll-on-input 'unset)
-    (message ";; unadjust comint-scroll options")
+    ;; unadjust comint-scroll options
     (setq comint-scroll-to-bottom-on-output bifocal--old-comint-scroll-on-output
           comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
   (setq bifocal--old-comint-scroll-on-output 'unset

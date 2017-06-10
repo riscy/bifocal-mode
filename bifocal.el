@@ -97,13 +97,13 @@
 (defvar-local bifocal--old-comint-scroll-on-input 'unset
   "Stores previously set value, so it can be restored.")
 
-(defvar-local bifocal--old-comint-scroll-on-output 'unset
+(defvar-local bifocal--old-comint-move-point-for-output 'unset
   "Stores previously set value, so it can be restored.")
 
-(defvar-local bifocal--head-window nil
+(defvar-local bifocal--head nil
   "For remembering which window is the head.")
 
-(defvar-local bifocal--tail-window nil
+(defvar-local bifocal--tail nil
   "For remembering which window is the tail.")
 
 (defun bifocal-down ()
@@ -153,12 +153,12 @@ Adjust comint-scroll variables for split-screen scrolling."
   (split-window-vertically (- (window-height) bifocal-tail-size))
   (when (eq bifocal--old-comint-scroll-on-input 'unset)
     ;; adjust comint-scroll options
-    (setq bifocal--old-comint-scroll-on-output comint-scroll-to-bottom-on-output
+    (setq bifocal--old-comint-move-point-for-output comint-move-point-for-output
           bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input))
-  (setq comint-scroll-to-bottom-on-output "this"
-        comint-scroll-to-bottom-on-input nil
-        bifocal--head-window (selected-window)
-        bifocal--tail-window (next-window)))
+  (setq comint-move-point-for-output "this"
+        comint-scroll-to-bottom-on-input nil)
+  (setq bifocal--head (selected-window)
+        bifocal--tail (next-window)))
 
 (defun bifocal--destroy-split ()
   "Destroy the head/tail window pair.
@@ -167,19 +167,19 @@ Restore comint-scroll variables to their original values."
     (delete-window))
   (unless (eq bifocal--old-comint-scroll-on-input 'unset)
     ;; unadjust comint-scroll options
-    (setq comint-scroll-to-bottom-on-output bifocal--old-comint-scroll-on-output
+    (setq comint-move-point-for-output bifocal--old-comint-move-point-for-output
           comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
-  (setq bifocal--old-comint-scroll-on-output 'unset
+  (setq bifocal--old-comint-move-point-for-output 'unset
         bifocal--old-comint-scroll-on-input 'unset
-        bifocal--head-window nil
-        bifocal--tail-window nil))
+        bifocal--head nil
+        bifocal--tail nil))
 
 (defun bifocal--find-head ()
   "Put the point on the head window.
 Return nil if the head window is not identifiable."
-  (and bifocal--head-window
-       bifocal--tail-window
-       (cond ((bifocal--point-on-tail-p) (windmove-up) t)
+  (and bifocal--head
+       bifocal--tail
+       (cond ((bifocal--point-on-tail-p) (select-window bifocal--head) t)
              ((bifocal--point-on-head-p) t)
              (t nil))))
 

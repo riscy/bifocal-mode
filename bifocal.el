@@ -115,7 +115,7 @@ If this scrolls to the last line, remove the split."
       (bifocal--move-point-down)
     (move-to-window-line -1)
     (bifocal--move-point-down)
-    (if (bifocal--last-line-p (point))
+    (if (bifocal--last-line-p)
         (bifocal-end)
       (windmove-down))
     (bifocal--recenter-at-point-max)))
@@ -183,11 +183,9 @@ Return nil if the head window is not identifiable."
              ((bifocal--point-on-head-p) t)
              (t nil))))
 
-(defun bifocal--last-line-p (point)
-  "Whether POINT is on the same line as `process-mark'."
-  (save-excursion
-    (goto-char point)
-    (>= (point-at-eol) (process-mark (get-buffer-process (current-buffer))))))
+(defun bifocal--last-line-p ()
+  "Whether POINT is on the last line of the buffer."
+    (eq (point-max) (point-at-eol)))
 
 (defun bifocal--move-point-down ()
   "Move the point down `bifocal-tail-size' rows, and recenter."
@@ -225,10 +223,9 @@ If HOME is non-nil, go to `point-min' instead."
 
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
-  (and (bifocal--last-line-p (point-marker))
-       (or
-        (bifocal--find-head)
-        (>= (window-height) bifocal-minimum-rows-before-splitting))))
+  (and (bifocal--last-line-p)
+       (or (bifocal--find-head)
+           (>= (window-height) bifocal-minimum-rows-before-splitting))))
 
 ;;;###autoload
 (define-minor-mode bifocal-mode

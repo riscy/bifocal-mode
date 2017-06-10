@@ -117,7 +117,7 @@ If this scrolls to the last line, remove the split."
     (bifocal--move-point-down)
     (if (bifocal--last-line-p)
         (bifocal-end)
-      (windmove-down))
+      (select-window bifocal--tail))
     (bifocal--recenter-at-point-max)))
 
 (defun bifocal-end ()
@@ -142,7 +142,7 @@ the head window.  If HOME is non-nil, scroll to the top."
          (unless (bifocal--find-head)
            (bifocal--create-split))
          (bifocal--move-point-up home)
-         (windmove-down)
+         (select-window bifocal--tail)
          (bifocal--recenter-at-point-max))
         (t (bifocal--move-point-up home))))
 
@@ -202,19 +202,22 @@ If HOME is non-nil, go to `point-min' instead."
       (ignore-errors (line-move (- bifocal-tail-size)))))
   (recenter -1))
 
+(defun bifocal--oriented-p (start-window dir end-window)
+  "Confirm the relative position of two windows viewing one buffer.
+That is, START-WINDOW is selected, moving in direction DIR (via
+'windmove') selects END-WINDOW, and both view the same buffer."
+  (and (eq (selected-window) start-window)
+       (let ((dir-window (windmove-find-other-window dir)))
+         (and (eq dir-window end-window)
+              (eq (current-buffer) (window-buffer dir-window))))))
+
 (defun bifocal--point-on-head-p ()
   "Whether the point is on the head window."
-  (let ((tail-window (windmove-find-other-window 'down)))
-    (and (eq tail-window bifocal--tail-window)
-         (eq (current-buffer) (window-buffer tail-window))
-         (eq (selected-window) bifocal--head-window))))
+  (bifocal--oriented-p bifocal--head 'down bifocal--tail))
 
 (defun bifocal--point-on-tail-p ()
   "Whether the point is on the tail window."
-  (let ((head-window (windmove-find-other-window 'up)))
-    (and (eq head-window bifocal--head-window)
-         (eq (current-buffer) (window-buffer head-window))
-         (eq (selected-window) bifocal--tail-window))))
+  (bifocal--oriented-p bifocal--tail 'up bifocal--head))
 
 (defun bifocal--recenter-at-point-max ()
   "Move the point to `point-max', and recenter."

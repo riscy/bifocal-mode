@@ -155,7 +155,7 @@ Adjust comint-scroll variables for split-screen scrolling."
     ;; adjust comint-scroll options
     (setq bifocal--old-comint-move-point-for-output comint-move-point-for-output
           bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input))
-  (setq comint-move-point-for-output "this"
+  (setq comint-move-point-for-output 'this
         comint-scroll-to-bottom-on-input nil)
   (setq bifocal--head (selected-window)
         bifocal--tail (next-window)))

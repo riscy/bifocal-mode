@@ -1,4 +1,4 @@
-#+TITLE: bifocal-mode 👓
+#+TITLE: bifocal-mode
 #+OPTIONS: toc:3 author:t creator:nil num:nil
 #+AUTHOR: Chris Rayner
 #+EMAIL: dchrisrayner@gmail.com
@@ -12,9 +12,9 @@
 - [[#key-bindings][Key bindings]]
 
 * Description
-  In ~bifocal-mode~, paging up causes a comint-mode window to be split in two
-  with a larger window on top (the head) and a smaller input window preserved on
-  the bottom (the tail):
+  In ~bifocal-mode~, paging up causes a comint-mode buffer to be split in two
+  windows with a larger window on top (the head) and a smaller input window
+  preserved on the bottom (the tail):
   #+begin_src
   +--------------+
   | -------      |
@@ -27,12 +27,18 @@
   |(show context)|
   +--------------+
   #+end_src
-  Paging down all the way causes the split to disappear.
+  This helps with monitoring new output and entering text at the prompt (in the
+  tail window), while reviewing previous output (in the head window).  Paging
+  down all the way causes the split to disappear.
 
-  This lets you enter text at the prompt (in the tail window) and monitor new
-  input, while reviewing previous output (in the head window).
+   Note if you're not on the last line of a buffer, no split will appear.
+
+  ~bifocal-mode~ used to be called ~shx-split~ when it was part of the [[https://github.com/riscy/shx-for-emacs][shx]]
+  extensions.
 
   Use ~M-x customize-group RET bifocal RET~ to see customization options.
+
+  /This version is tested with Emacs 25.2.1/
 * Install
   Add the following to your ~.emacs~:
 

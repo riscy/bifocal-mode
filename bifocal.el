@@ -24,9 +24,9 @@
 
 ;;; Commentary:
 
-;; In bifocal-mode, paging up causes a comint-mode window to be split in two
-;; with a larger window on top (the head) and a smaller input window preserved
-;; on the bottom (the tail):
+;; In bifocal-mode, paging up causes a comint-mode buffer to be split into two
+;; windows with a larger window on top (the head) and a smaller input window
+;; preserved on the bottom (the tail):
 ;;
 ;; +--------------+
 ;; | -------      |
@@ -39,13 +39,13 @@
 ;; |(show context)|
 ;; +--------------+
 ;;
-;; Paging down all the way causes the split to disappear.  This lets you enter
-;; text at the prompt (in the tail window) and monitor new input, while
-;; reviewing previous output (in the head window).
+;; This helps with monitoring new output and entering text at the prompt (in the
+;; tail window), while reviewing previous output (in the head window).  Paging
+;; down all the way causes the split to disappear.
 ;;
-;; Note if you're not on the last line of the buffer, no split will appear.
+;; Note if you're not on the last line of a buffer, no split will appear.
 ;;
-;; This version tested with Emacs 25.1.1
+;; This version tested with Emacs 25.2.1
 ;;
 ;; See README.org for more details.
 
@@ -80,7 +80,7 @@
   :type 'string)
 
 (defcustom bifocal-tail-size 15
-  "How large the tail will be when splitting the window."
+  "The number of rows in the tail when splitting."
   :type 'integer)
 
 (defvar bifocal-mode-map
@@ -108,8 +108,8 @@
 
 (defun bifocal-down ()
   "Scroll down.
-If the window is split, scroll down in the head window only.  If
-this scrolls all the way to the last line, remove the split."
+If the window is split, scroll down in the head window only.
+If this scrolls to the last line, remove the split."
   (interactive)
   (if (not (bifocal--find-head))
       (bifocal--move-point-down)

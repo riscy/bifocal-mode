@@ -14,24 +14,12 @@
 * Description
   In ~bifocal-mode~, paging up causes a comint-mode buffer to be split in two
   windows with a larger window on top (the head) and a smaller input window
-  preserved on the bottom (the tail):
-  #+begin_src
-  +--------------+
-  | -------      |
-  | -------      |
-  | -------      |
-  |    [head]    |
-  |(show history)|
-  +--------------+
-  |    [tail]    |
-  |(show context)|
-  +--------------+
-  #+end_src
-  This helps with monitoring new output and entering text at the prompt (in the
-  tail window), while reviewing previous output (in the head window).  Paging
-  down all the way causes the split to disappear.
+  preserved on the bottom (the tail).  This helps with monitoring new output and
+  entering text at the prompt (in the tail window), while reviewing previous
+  output (in the head window).  Paging down all the way causes the split to
+  disappear.
 
-   Note if you're not on the last line of a buffer, no split will appear.
+  Note if you're not on the last line of a buffer, no split will appear.
 
   ~bifocal-mode~ used to be called ~shx-split~ when it was part of the [[https://github.com/riscy/shx-for-emacs][shx]]
   extensions.

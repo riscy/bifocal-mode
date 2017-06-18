@@ -94,11 +94,14 @@
     keymap)
   "Keymap for the bifocal minor mode.")
 
-(defvar-local bifocal--old-comint-scroll-on-input 'unset
-  "Stores previously set value, so it can be restored.")
+(defvar-local bifocal--old-comint-move-point-for-output :none
+  "Stores a previous value, so it can be reset.")
 
-(defvar-local bifocal--old-comint-move-point-for-output 'unset
-  "Stores previously set value, so it can be restored.")
+(defvar-local bifocal--old-comint-scroll-on-input :none
+  "Stores a previous value, so it can be reset.")
+
+(defvar-local bifocal--old-window-dedicated-p :none
+  "Stores a previous value, so it can be reset.")
 
 (defvar-local bifocal--head nil
   "For remembering which window is the head.")
@@ -147,32 +150,20 @@ the head window.  If HOME is non-nil, scroll to the top."
         (t (bifocal--move-point-up home))))
 
 (defun bifocal--create-split ()
-  "Create the head/tail split, leaving `point' on the head.
-Adjust comint-scroll variables for split-screen scrolling."
-  (bifocal--recenter-at-point-max)
+  "Create the head/tail split."
   (split-window-vertically (- (window-height) bifocal-tail-size))
-  (when (eq bifocal--old-comint-scroll-on-input 'unset)
-    ;; adjust comint-scroll options
-    (setq bifocal--old-comint-move-point-for-output comint-move-point-for-output
-          bifocal--old-comint-scroll-on-input comint-scroll-to-bottom-on-input))
-  (setq comint-move-point-for-output 'this
-        comint-scroll-to-bottom-on-input nil)
-  (setq bifocal--head (selected-window)
-        bifocal--tail (next-window)))
+  (setq-local bifocal--head (selected-window))
+  (setq-local bifocal--tail (next-window))
+  (bifocal--set-scroll-options)
+  (bifocal--set-dedicated-windows))
 
 (defun bifocal--destroy-split ()
-  "Destroy the head/tail window pair.
-Restore comint-scroll variables to their original values."
-  (when (bifocal--find-head)
-    (delete-window))
-  (unless (eq bifocal--old-comint-scroll-on-input 'unset)
-    ;; unadjust comint-scroll options
-    (setq comint-move-point-for-output bifocal--old-comint-move-point-for-output
-          comint-scroll-to-bottom-on-input bifocal--old-comint-scroll-on-input))
-  (setq bifocal--old-comint-move-point-for-output 'unset
-        bifocal--old-comint-scroll-on-input 'unset
-        bifocal--head nil
-        bifocal--tail nil))
+  "Destroy the head/tail window pair."
+  (bifocal--reset-dedicated-windows)
+  (bifocal--reset-scroll-options)
+  (when (bifocal--find-head) (delete-window bifocal--tail))
+  (setq-local bifocal--head nil)
+  (setq-local bifocal--tail nil))
 
 (defun bifocal--find-head ()
   "Put the point on the head window.
@@ -224,11 +215,49 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   (goto-char (point-max))
   (recenter -1))
 
+(defun bifocal--set-scroll-options ()
+  "Adjust comint-scroll variables for split-screen scrolling."
+  (when (eq bifocal--old-comint-scroll-on-input :none)
+    (setq-local bifocal--old-comint-move-point-for-output
+                comint-move-point-for-output))
+  (when (eq bifocal--old-comint-scroll-on-input :none)
+    (setq-local bifocal--old-comint-scroll-on-input
+                comint-scroll-to-bottom-on-input))
+  (setq-local comint-move-point-for-output 'this)
+  (setq-local comint-scroll-to-bottom-on-input nil))
+
+(defun bifocal--set-dedicated-windows ()
+  "Adjust window-dedicated options on the head and tail windows."
+  (when (eq bifocal--old-window-dedicated-p :none)
+    (setq-local bifocal--old-window-dedicated-p (window-dedicated-p)))
+  (set-window-dedicated-p bifocal--head t)
+  (set-window-dedicated-p bifocal--tail t))
+
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
   (and (bifocal--last-line-p)
        (or (bifocal--find-head)
            (>= (window-height) bifocal-minimum-rows-before-splitting))))
+
+(defun bifocal--reset-scroll-options ()
+  "Reset comint-scroll variables to their original values."
+  (unless (eq bifocal--old-comint-move-point-for-output :none)
+    (setq-local comint-move-point-for-output
+                bifocal--old-comint-move-point-for-output)
+    (setq-local bifocal--old-comint-move-point-for-output :none))
+  (unless (eq bifocal--old-comint-scroll-on-input :none)
+    (setq-local comint-scroll-to-bottom-on-input
+                bifocal--old-comint-scroll-on-input)
+    (setq-local bifocal--old-comint-scroll-on-input :none)))
+
+(defun bifocal--reset-dedicated-windows ()
+  "Reset window-dedicated options on the head and tail windows."
+  (unless (eq bifocal--old-window-dedicated-p :none)
+    (when (window-live-p bifocal--head)
+      (set-window-dedicated-p bifocal--head bifocal--old-window-dedicated-p))
+    (when (window-live-p bifocal--tail)
+      (set-window-dedicated-p bifocal--tail bifocal--old-window-dedicated-p))
+    (setq bifocal--old-window-dedicated-p :none)))
 
 ;;;###autoload
 (define-minor-mode bifocal-mode

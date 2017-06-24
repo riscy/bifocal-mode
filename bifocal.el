@@ -84,13 +84,6 @@
 This is also the number of lines to scroll by at a time."
   :type 'integer)
 
-(defcustom bifocal-use-modified-scroll-options t
-  "Whether to modify comint's scroll options when splitting.
-The original settings are restored when the split is destroyed."
-  :link '(variable-link comint-move-point-for-output)
-  :link '(variable-link comint-scroll-to-bottom-on-input)
-  :type 'boolean)
-
 (defcustom bifocal-use-dedicated-windows t
   "Whether to flag the head and tail as \"dedicated\" windows.
 The original settings are restored when the split is destroyed."
@@ -168,7 +161,7 @@ the head window.  If HOME is non-nil, scroll to the top."
   (split-window-vertically (- (window-height) bifocal-tail-size))
   (setq-local bifocal--head (selected-window))
   (setq-local bifocal--tail (next-window))
-  (when (and bifocal-use-modified-scroll-options (derived-mode-p 'comint-mode))
+  (when (derived-mode-p 'comint-mode)
     (bifocal--set-scroll-options))
   (when bifocal-use-dedicated-windows
     (bifocal--set-dedicated-windows)))

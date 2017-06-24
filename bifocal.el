@@ -197,11 +197,12 @@ Return nil if the head window is not identifiable."
 (defun bifocal--move-point-up (&optional home)
   "Move the point up `bifocal-tail-size' rows, and recenter.
 If HOME is non-nil, go to `point-min' instead."
-  (if home
-      (goto-char (point-min))
-    (let ((line-move-visual t))
-      (ignore-errors (line-move (- bifocal-tail-size)))))
-  (recenter -1))
+  (cond (home
+         (goto-char (point-min)))
+        ((not (bifocal--top-p))
+         (let ((line-move-visual t))
+           (ignore-errors (line-move (- bifocal-tail-size))))
+         (recenter -1))))
 
 (defun bifocal--oriented-p (start-window dir end-window)
   "Confirm the relative position of two windows viewing one buffer.
@@ -248,6 +249,12 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   (and (bifocal--last-line-p)
        (or (bifocal--find-head)
            (>= (window-height) bifocal-minimum-rows-before-splitting))))
+
+(defun bifocal--top-p ()
+  "Whether `point-min' is visible in this window."
+  (save-excursion
+    (move-to-window-line 0)
+    (eq (point-at-bol) (point-min))))
 
 (defun bifocal--unset-scroll-options ()
   "Unset comint-scroll variables to their original values."

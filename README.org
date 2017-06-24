@@ -10,6 +10,7 @@
 - [[#install][Install]]
 - [[#run][Run]]
 - [[#key-bindings][Key bindings]]
+- [[#customization][Customization]]
 
 * Description
   In ~bifocal-mode~, paging up causes a comint-mode buffer to be split in two
@@ -28,7 +29,8 @@
 
   /This version is tested with Emacs 25.2.1/
 * Install
-  Add the following to your ~.emacs~:
+  Installation using *MELPA* is coming soon.  For now, download ~bifocal.el~ and
+  add the following to your ~.emacs~:
 
   #+begin_src elisp
   (add-to-list 'load-path "~/path/to/bifocal/")
@@ -65,3 +67,14 @@
             (define-key evil-insert-state-local-map (kbd "C-d") #'bifocal-down)
             (define-key evil-normal-state-local-map (kbd "C-d") #'bifocal-down))
   #+end_src
+* Customization
+  The following can be customized with ~M-x customize-group RET bifocal RET~
+  or by setting their values in your config:
+  - ~bifocal-minimum-rows-before-splitting~ :: The minimum window height before
+       splitting the window is allowed.
+  - ~bifocal-tail-size~ :: The number of rows the tail window will have.  This
+       is also the number of lines to scroll by at a time.
+  - ~bifocal-use-dedicated-windows~ :: Whether to flag the head and tail as
+       "dedicated" windows.  The original settings are restored when the split
+       is destroyed.  The default is ~t~ which prevents splits from being
+       clobbered as new buffers pop into view.

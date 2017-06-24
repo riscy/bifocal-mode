@@ -1,4 +1,4 @@
-;;; bifocal.el --- split-screen scrolling for comint-mode buffers
+;;; bifocal.el --- Split-screen scrolling for comint-mode buffers
 
 ;; Authors: Chris Rayner (dchrisrayner @ gmail)
 ;; Created: May 23 2011

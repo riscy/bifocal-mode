@@ -3,11 +3,15 @@
 #+AUTHOR: Chris Rayner
 #+EMAIL: dchrisrayner@gmail.com
 
+[[https://melpa.org/#/shx][http://melpa.org/packages/bifocal-badge.svg]] [[https://stable.melpa.org/#/shx][https://stable.melpa.org/packages/bifocal-badge.svg]]
+
 [[file:img/screenshot.png]]
 
 * Table of Contents :TOC_3_gh:noexport:
 - [[#description][Description]]
 - [[#install][Install]]
+    - [[#from-melpa][From MELPA]]
+    - [[#manually][Manually]]
 - [[#run][Run]]
 - [[#key-bindings][Key bindings]]
 - [[#customization][Customization]]
@@ -29,13 +33,14 @@
 
   /This version is tested with Emacs 25.2.1/
 * Install
-  Installation using *MELPA* is coming soon.  For now, download ~bifocal.el~ and
-  add the following to your ~.emacs~:
-
-  #+begin_src elisp
-  (add-to-list 'load-path "~/path/to/bifocal/")
-  (require 'bifocal)
-  #+end_src
+*** From MELPA
+    Use ~M-x package-install RET bifocal RET~ to install bifocal from [[https://melpa.org/][MELPA]].
+*** Manually
+    Download ~bifocal.el~ and add the following to your ~.emacs~:
+    #+begin_src elisp
+    (add-to-list 'load-path "~/path/to/bifocal/")
+    (require 'bifocal)
+    #+end_src
 * Run
   To enable ~bifocal-mode~ in every ~comint-mode~ buffer, use:
 

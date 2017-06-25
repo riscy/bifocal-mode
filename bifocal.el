@@ -224,7 +224,8 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 (defun bifocal--recenter-at-point-max ()
   "Move the point to `point-max', and recenter."
   (goto-char (point-max))
-  (recenter -1))
+  ;; `recenter'ing errors when this isn't the active buffer:
+  (ignore-errors (recenter -1)))
 
 (defun bifocal--set-scroll-options ()
   "Adjust comint-scroll variables for split-screen scrolling."

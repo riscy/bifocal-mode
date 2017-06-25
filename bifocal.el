@@ -131,11 +131,9 @@ If this scrolls to the last line, remove the split."
     (bifocal--recenter-at-point-max)))
 
 (defun bifocal-end ()
-  "Scroll to the end of the buffer.
-Remove the head/tail split if it exists."
+  "Scroll to the end of the buffer."
   (interactive)
-  (bifocal--destroy-split)
-  (bifocal--recenter-at-point-max))
+  (bifocal--turn-off))
 
 (defun bifocal-home ()
   "Scroll to the top of the buffer.
@@ -257,6 +255,14 @@ That is, START-WINDOW is selected, moving in direction DIR (via
     (move-to-window-line 0)
     (eq (point-at-bol) (point-min))))
 
+(defun bifocal--turn-off ()
+  "Remove the head/tail split if it exists."
+  (bifocal--destroy-split)
+  (bifocal--recenter-at-point-max))
+
+(defun bifocal--turn-on ()
+  (when (derived-mode-p 'comint-mode) (bifocal-mode +1)))
+
 (defun bifocal--unset-scroll-options ()
   "Unset comint-scroll variables to their original values."
   (unless (eq bifocal--old-comint-move-point-for-output :none)
@@ -291,13 +297,10 @@ buffers that support it.\n
   :keymap bifocal-mode-map
   (if bifocal-mode
       nil
-    (bifocal-end)))
+    (bifocal--turn-off)))
 
 ;;;###autoload
-(define-globalized-minor-mode bifocal-global-mode bifocal-mode
-  (lambda ()
-    (interactive)
-    (when (derived-mode-p 'comint-mode) (bifocal-mode +1))))
+(define-globalized-minor-mode bifocal-global-mode bifocal-mode bifocal--turn-on)
 
 (provide 'bifocal)
 ;;; bifocal.el ends here

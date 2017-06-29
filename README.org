@@ -67,6 +67,8 @@
 
   #+begin_src elisp
   (add-hook 'comint-mode-hook
+            (define-key evil-normal-state-local-map (kbd "gg")  #'bifocal-home)
+            (define-key evil-normal-state-local-map (kbd "G")   #'bifocal-end)
             (define-key evil-insert-state-local-map (kbd "C-u") #'bifocal-up)
             (define-key evil-normal-state-local-map (kbd "C-u") #'bifocal-up)
             (define-key evil-insert-state-local-map (kbd "C-d") #'bifocal-down)

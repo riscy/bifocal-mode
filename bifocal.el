@@ -261,6 +261,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   (bifocal--recenter-at-point-max))
 
 (defun bifocal--turn-on ()
+  "Call the function `bifocal-mode' if appropriate."
   (when (derived-mode-p 'comint-mode) (bifocal-mode +1)))
 
 (defun bifocal--unset-scroll-options ()

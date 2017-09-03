@@ -123,7 +123,6 @@ If this scrolls to the last line, remove the split."
   (interactive)
   (if (not (bifocal--find-head))
       (bifocal--move-point-down)
-    (move-to-window-line -1)
     (bifocal--move-point-down)
     (if (bifocal--last-line-p)
         (bifocal-end)
@@ -188,6 +187,7 @@ Return nil if the head window is not identifiable."
 
 (defun bifocal--move-point-down ()
   "Move the point down `bifocal-tail-size' rows, and recenter."
+  (move-to-window-line -1)
   (let ((line-move-visual t))
     (ignore-errors (line-move bifocal-tail-size)))
   (recenter -1))

@@ -5,7 +5,7 @@
 ;; Keywords: frames, processes, tools
 ;; URL: https://github.com/riscy/bifocal-mode
 ;; Package-Requires: ((emacs "24.4"))
-;; Version: 0.0.1
+;; Version: 0.0.3
 
 ;; This file is NOT part of GNU Emacs.
 

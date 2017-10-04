@@ -1,7 +1,9 @@
 ;;; bifocal-test.el --- Tests for bifocal-mode
 
 ;; Authors: Chris Rayner (dchrisrayner @ gmail)
-;; Homepage: https://github.com/riscy/bifocal-mode
+;; URL: https://github.com/riscy/bifocal-mode
+;; Package-Requires: ((emacs "24.4"))
+;; Version: 0.0.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -60,3 +62,4 @@
                      (null (bifocal--find-head)))))
 
 (provide 'bifocal-test)
+;;; bifocal-test.el ends here

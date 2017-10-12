@@ -67,7 +67,7 @@
   :prefix "bifocal-"
   :group 'comint
   :link '(url-link
-          :tag "the Github repository"
+          :tag "bifocal on GitHub"
           "https://github.com/riscy/bifocal-mode"))
 
 (defcustom bifocal-minimum-rows-before-splitting 30

@@ -36,14 +36,11 @@
       (shx-test-warn "Warning: window too short to test bifocal")
     (shx-test-assert "Create split, don't move cursor."
                      (let ((currpt (point)))
-                       (bifocal-up)
+                       ;; Manually create window (instead of `bifocal-up')
+                       ;; to force the creation of a split.
+                       (bifocal--create-split)
+                       (select-window bifocal--tail)
                        (eq currpt (point))))
-    (shx-test-assert "Maintain split."
-                     (let ((currpt (point)))
-                       (bifocal-home)
-                       (eq currpt (point))))
-    ;;(shx-test-assert "Stay in head when paging up on the head."
-    ;;(shx-test-assert "Stay in head when paging down on the head."
     (shx-test-assert "Destroy split, don't move cursor."
                      (let ((currpt (point)))
                        (bifocal-end)

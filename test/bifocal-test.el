@@ -29,7 +29,7 @@
 
 (require 'shx-test)
 
-(defun shx-test-case-bifocal-mode ()
+(defun shx-test-integration-bifocal-mode ()
   "Test window splitting functions."
   (goto-char (point-max))
   (if (< (window-height) bifocal-minimum-rows-before-splitting)

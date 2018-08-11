@@ -168,7 +168,8 @@ the head window.  If HOME is non-nil, scroll to the top."
   (bifocal--unset-dedicated-windows)
   (bifocal--unset-scroll-options)
   (when (bifocal--find-head)
-    (delete-window bifocal--tail))
+    ;; removing head instead of tail keeps the cursor in place
+    (delete-window bifocal--head))
   (setq-local bifocal--head nil)
   (setq-local bifocal--tail nil))
 

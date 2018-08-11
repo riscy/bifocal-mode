@@ -29,34 +29,43 @@
 
 (require 'shx-test)
 
-(defun shx-test-integration-bifocal-mode ()
+(defun shx-test-integration-bifocal-splitting ()
   "Test window splitting functions."
   (goto-char (point-max))
   (if (< (window-height) bifocal-minimum-rows-before-splitting)
-      (shx-test-warn "Warning: window too short to test bifocal")
-    (shx-test-assert "Create split, don't move cursor."
+      (shx-test-warn "Warning: window too short to test bifocal-splitting")
+    (forward-line -1)
+    (shx-test-assert "bifocal--splittable-p is false when not on last line"
+                     (not (bifocal--splittable-p)))
+    (goto-char (point-max))
+    (shx-test-assert "bifocal--create-split split doesn't move cursor"
                      (let ((currpt (point)))
                        ;; Manually create window (instead of `bifocal-up')
                        ;; to force the creation of a split.
                        (bifocal--create-split)
                        (select-window bifocal--tail)
                        (eq currpt (point))))
-    (shx-test-assert "Destroy split, don't move cursor."
+    ;; NOTE: the next tests assume window has been split from test above:
+    (shx-test-assert "bifocal--oriented-p recognizes window orientation"
+        (bifocal--oriented-p bifocal--tail 'up bifocal--head))
+    (shx-test-assert "bifocal-end doesn't move the cursor"
                      (let ((currpt (point)))
                        (bifocal-end)
                        (eq currpt (point))))
-    (shx-test-assert "Create and destroy with home/end."
+    (shx-test-assert "bifocal-home/bifocal-end don't move the cursor"
                      (let ((currpt (point)))
                        (bifocal-home)
                        (bifocal-end)
                        (eq currpt (point))))
-    (shx-test-assert "Create destroy with pgup/pgdn."
+    (shx-test-assert "bifocal-up/bifocal-down don't move the cursor"
                      (let ((currpt (point)))
                        (bifocal-up) (bifocal-up)
                        (bifocal-down) (bifocal-down) (bifocal-down)
-                       (eq currpt (point))))
-    (shx-test-assert "Try to find nonexistent split."
-                     (null (bifocal--find-head)))))
+                       (eq currpt (point))))))
+
+(defun shx-test-integration-bifocal-find-head ()
+  (shx-test-assert "bifocal--find-head with no split returns nil"
+                   (null (bifocal--find-head))))
 
 (provide 'bifocal-test)
 ;;; bifocal-test.el ends here

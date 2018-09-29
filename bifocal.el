@@ -247,7 +247,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
   (and (bifocal--last-line-p)
-       (>= (line-number-at-pos) (window-screen-lines))
+       (not (bifocal--top-p))
        (or (bifocal--find-head)
            (>= (window-height) bifocal-minimum-rows-before-splitting))))
 

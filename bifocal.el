@@ -184,7 +184,8 @@ Return nil if the head window is not identifiable."
 
 (defun bifocal--last-line-p ()
   "Whether POINT is on the last line of the buffer."
-    (eq (point-max) (point-at-eol)))
+  (let ((inhibit-field-text-motion t))
+    (eq (point-max) (point-at-eol))))
 
 (defun bifocal--move-point-down ()
   "Move the point down `bifocal-tail-size' rows, and recenter."

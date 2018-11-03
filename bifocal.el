@@ -225,7 +225,10 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   "Ensure point is on the last line, and recenter."
   (when (not (bifocal--last-line-p)) (goto-char (point-max)))
   ;; `recenter'ing errors when this isn't the active buffer:
-  (ignore-errors (recenter -1)))
+  (ignore-errors (recenter -1))
+  ;; move to the input area if we're on the output area:
+  (when (eq (get-text-property (point) 'field) 'output)
+    (goto-char (point-at-eol))))
 
 (defun bifocal--set-scroll-options ()
   "Adjust comint-scroll variables for split-screen scrolling."

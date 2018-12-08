@@ -2,7 +2,7 @@
 
 ;; Authors: Chris Rayner (dchrisrayner @ gmail)
 ;; Created: May 23 2011
-;; Keywords: frames, processes, tools
+;; Keywords: frames, processes
 ;; URL: https://github.com/riscy/bifocal-mode
 ;; Package-Requires: ((emacs "24.4"))
 ;; Version: 0.0.5

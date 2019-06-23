@@ -1,4 +1,4 @@
-;;; bifocal.el --- Split-screen scrolling for comint-mode buffers
+;;; bifocal.el --- Split-screen scrolling for comint-mode buffers -*- lexical-binding: t -*-
 
 ;; Authors: Chris Rayner (dchrisrayner @ gmail)
 ;; Created: May 23 2011
@@ -71,7 +71,7 @@
   :link '(function-link bifocal--splittable-p)
   :type 'integer)
 
-(defcustom bifocal-lighter "B"
+(defcustom bifocal-lighter " B"
   "Mode-line lighter for the bifocal minor mode."
   :type 'string)
 
@@ -219,7 +219,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 
 (defun bifocal--recenter-on-last-line ()
   "Ensure point is on the last line, and recenter."
-  (when (not (bifocal--last-line-p)) (goto-char (point-max)))
+  (unless (bifocal--last-line-p) (goto-char (point-max)))
   ;; `recenter'ing errors when this isn't the active buffer:
   (ignore-errors (recenter -1))
   ;; move to the input area if we're on the output area:

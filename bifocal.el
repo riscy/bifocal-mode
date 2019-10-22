@@ -170,6 +170,7 @@ Return nil if the head window is not identifiable."
 
 (defun bifocal--last-line-p ()
   "Whether POINT is on the last line of the buffer."
+  (declare (side-effect-free t))
   (let ((inhibit-field-text-motion t))
     (eq (point-max) (point-at-eol))))
 
@@ -194,6 +195,7 @@ If HOME is non-nil, go to `point-min' instead."
   "Confirm the relative position of two windows viewing one buffer.
 That is, START-WINDOW is selected, moving in direction DIR (via
 'windmove') selects END-WINDOW, and both view the same buffer."
+  (declare (side-effect-free t))
   (and (eq (selected-window) start-window)
        (let ((dir-window (windmove-find-other-window dir)))
          (and (eq dir-window end-window)
@@ -201,10 +203,12 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 
 (defun bifocal--point-on-head-p ()
   "Whether the point is on the head window."
+  (declare (side-effect-free t))
   (bifocal--oriented-p bifocal--head 'down bifocal--tail))
 
 (defun bifocal--point-on-tail-p ()
   "Whether the point is on the tail window."
+  (declare (side-effect-free t))
   (bifocal--oriented-p bifocal--tail 'up bifocal--head))
 
 (defun bifocal--recenter-on-last-line ()
@@ -236,6 +240,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 
 (defun bifocal--splittable-p ()
   "Whether the current window is able to be split."
+  (declare (side-effect-free t))
   (and (bifocal--last-line-p)
        (not (bifocal--top-p))
        (or (bifocal--find-head)
@@ -243,6 +248,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 
 (defun bifocal--top-p ()
   "Whether `point-min' is visible in this window."
+  (declare (side-effect-free t))
   (save-excursion
     (move-to-window-line 0)
     (eq (point-at-bol) (point-min))))

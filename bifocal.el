@@ -6,7 +6,7 @@
 ;; URL: https://github.com/riscy/bifocal-mode
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Package-Requires: ((emacs "24.4"))
-;; Version: 0.0.5
+;; Version: 0.0.6
 
 ;;; Commentary:
 

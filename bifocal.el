@@ -154,8 +154,10 @@ the head window.  If HOME is non-nil, scroll to the top."
   (bifocal--unset-dedicated-windows)
   (bifocal--unset-scroll-options)
   (when (bifocal--find-head)
-    ;; removing head instead of tail keeps the cursor in place
-    (delete-window bifocal--head))
+    ;; removing the tail always maintains window size, but could move the point:
+    (let ((pt (save-window-excursion (select-window bifocal--tail) (point))))
+      (delete-window bifocal--tail)
+      (goto-char pt)))
   (setq-local bifocal--head nil)
   (setq-local bifocal--tail nil))
 

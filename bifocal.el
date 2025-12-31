@@ -6,7 +6,7 @@
 ;; URL: https://github.com/riscy/bifocal-mode
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;; Package-Requires: ((emacs "24.4"))
-;; Version: 0.0.6
+;; Version: 0.0.7
 
 ;;; Commentary:
 
@@ -30,18 +30,10 @@
 ;; down all the way causes the split to disappear.
 ;;
 ;; Note if you're not on the last line of a buffer, no split will appear.
-;;
-;; This version tested with Emacs 25.2.1
-;;
-;; See README.org for more details.
 
-;;; Installation:
+;;; Debug:
 
-;; 1. Move this file to a directory in your load-path or add
-;;    this to your .emacs:
-;;    (add-to-list 'load-path "~/path/to/this-file/")
-;; 2. Next add this line to your .emacs:
-;;    (require 'bifocal)
+;; This version tested with Emacs 30.1
 
 ;;; Code:
 
@@ -49,7 +41,7 @@
 (require 'windmove)
 
 (defgroup bifocal nil
-  "For split-screen scrolling inside a comint-mode buffer."
+  "For split-screen scrolling inside a `comint-mode' buffer."
   :prefix "bifocal-"
   :group 'comint
   :link '(url-link
@@ -62,7 +54,7 @@
   :type 'integer)
 
 (defcustom bifocal-lighter " B"
-  "Mode-line lighter for the bifocal minor mode."
+  "Mode-line lighter."
   :type 'string)
 
 (defcustom bifocal-tail-size 15
@@ -174,7 +166,7 @@ Return nil if the head window is not identifiable."
   "Whether POINT is on the last line of the buffer."
   (declare (side-effect-free t))
   (let ((inhibit-field-text-motion t))
-    (eq (point-max) (point-at-eol))))
+    (eq (point-max) (line-end-position))))
 
 (defun bifocal--move-point-down ()
   "Move the point down `bifocal-tail-size' rows, and recenter."
@@ -196,7 +188,7 @@ If HOME is non-nil, go to `point-min' instead."
 (defun bifocal--oriented-p (start-window dir end-window)
   "Confirm the relative position of two windows viewing one buffer.
 That is, START-WINDOW is selected, moving in direction DIR (via
-'windmove') selects END-WINDOW, and both view the same buffer."
+windmove) selects END-WINDOW, and both view the same buffer."
   (declare (side-effect-free t))
   (and (eq (selected-window) start-window)
        (let ((dir-window (windmove-find-other-window dir)))
@@ -220,7 +212,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   (ignore-errors (recenter -1))
   ;; move to the input area if we're on the output area:
   (when (eq (get-text-property (point) 'field) 'output)
-    (goto-char (point-at-eol))))
+    (end-of-line)))
 
 (defun bifocal--set-scroll-options ()
   "Adjust comint-scroll variables for split-screen scrolling."
@@ -253,7 +245,7 @@ That is, START-WINDOW is selected, moving in direction DIR (via
   (declare (side-effect-free t))
   (save-excursion
     (move-to-window-line 0)
-    (eq (point-at-bol) (point-min))))
+    (eq (line-beginning-position) (point-min))))
 
 (defun bifocal--turn-off ()
   "Remove the head/tail split if it exists."
@@ -286,13 +278,13 @@ That is, START-WINDOW is selected, moving in direction DIR (via
 
 ;;;###autoload
 (define-minor-mode bifocal-mode
-  "Toggle bifocal-mode on or off.\n
-  bifocal-mode splits the buffer into a head and a tail when
-paging up and down in a comint-mode derived buffer (such as
-shell-mode, inferior-python-mode, etc).\n
+  "Toggle the mode on or off.
+This mode splits the buffer into a head and a tail when
+paging up and down in a `comint-mode' derived buffer (such as
+`shell-mode', `inferior-python-mode', etc).
   Use `bifocal-global-mode' to enable `bifocal-mode' in all
-buffers that support it.\n
-  Provides the following bindings:\n
+buffers that support it.
+  Provides the following bindings:
 \\{bifocal-mode-map}"
   :lighter bifocal-lighter
   :keymap bifocal-mode-map

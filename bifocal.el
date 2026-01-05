@@ -1,6 +1,7 @@
 ;;; bifocal.el --- Split-screen scrolling for comint-mode buffers -*- lexical-binding: t -*-
 
-;; Authors: Chris Rayner (dchrisrayner@gmail.com)
+;; Author: <https://github.com/riscy/bifocal-mode/graphs/contributors>
+;; Maintainer: Chris Rayner <dchrisrayner@gmail.com>
 ;; Created: May 23 2011
 ;; Keywords: frames, processes
 ;; URL: https://github.com/riscy/bifocal-mode
